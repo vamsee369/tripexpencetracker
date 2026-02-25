@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Budget Monitor</title>
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#0d6efd">
+
+    <!-- Favicon -->
+
+    <link rel="shortcut icon" href="{% static 'icons/favicon.ico' %}" type="image/x-icon">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#4CAF50">
+
+    <!-- Styles -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #74ebd5, #ACB6E5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 50px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: block;
+            width: 250px;
+            padding: 15px 0;
+            margin: 20px 0;
+            text-align: center;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            background: #ff7e5f;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #feb47b;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to Trip Budget and Expenses Monitoring System</h1>
+    <a href="{% url 'make_trip' %}" class="btn">Make a New Trip</a>
+    <a href="{% url 'trip_history' %}" class="btn">Trip History</a>
+    <a href="{% url 'trip_list' %}" class="btn">Trip List</a>
+
+    <!-- Install prompt button -->
+    <button id="installBtn" style="display:none; padding:10px 20px; font-size:16px; margin-top:20px;">
+        Install App
+    </button>
+
+    <footer style="
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 100%;
+        padding: 10px 0;
+        background-color: #f2f2f2;
+    ">
+        Designed by <span style="color: #ff4500; font-weight: bold;">VAMSEE TANDRA</span>
+    </footer>
+
+    <!-- Service Worker & Install -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register("{% static 'service-worker.js' %}")
+                    .then(function (registration) {
+                        console.log("Service Worker Registered");
+                    })
+                    .catch(function (error) {
+                        console.log("Service Worker Failed:", error);
+                    });
+            });
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'block';
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            document.getElementById('installBtn').style.display = 'none';
+            deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            console.log('User response:', choiceResult.outcome);
+            deferredPrompt = null;
+        });
+    </script>
+</body>
+
+</html>
